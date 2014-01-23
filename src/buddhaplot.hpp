@@ -5,6 +5,12 @@
 
 
 
+//class Buddhaplot;
+//std::ostream &
+//operator<< (std::ostream &, Buddhaplot const &);
+
+
+
 // This code sort of iffy.
 template <class T>
 using Histogram = std::vector<std::vector<T>>;
