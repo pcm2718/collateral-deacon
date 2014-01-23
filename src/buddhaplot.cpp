@@ -1,4 +1,5 @@
 #include "buddhaplot.hpp"
+#include <algorithm>
 
 
 
@@ -23,14 +24,14 @@ operator<< (std::ostream & ost, Buddhaplot const & plot)
     /*
      * Put the actual greydata into the stream.
      */
-    for (auto const & y : plot.histogram)
+    for ( int j = plot.RESOLUTION.second - 1 ; j >= 0 ; --j )
       {
-	for (auto const & x : y)
+	for ( int i = 0 ; i < plot.RESOLUTION.first ; ++i )
 	  {
 	    /*
 	     * Get the greyvalue, put it and a following space into the stream.
 	     */
-	    ost << plot.get_color (x) << " ";
+	    ost << plot.get_color (plot.histogram[i][j]) << " ";
 	  }
 	ost << std::endl;
       }
