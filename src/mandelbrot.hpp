@@ -12,19 +12,19 @@ public:
    * Public Methods
    */
 
-  Mandelbrot (long max_ittr): MAX_ITTR(max_ittr)
+  Mandelbrot (long const & max_ittr): MAX_ITTR(max_ittr)
     {
     };
 
 
 
   long
-  get_score (const std::complex<double> cval);
+  get_score (std::complex<double> const & cval) const;
 
 
 
   std::vector<std::complex<double>>
-  get_trajectory (const std::complex<double> cval);
+  get_trajectory (std::complex<double> const & cval) const;
 
 
 
@@ -32,5 +32,5 @@ public:
    * Public Variables
    */
 
-  const long MAX_ITTR;
+  long const MAX_ITTR;
 };

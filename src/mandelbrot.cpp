@@ -3,7 +3,7 @@
 
 
 long
-Mandelbrot::get_score (const std::complex<double> cval)
+Mandelbrot::get_score (std::complex<double> const & cval) const
   {
     auto zval = std::complex<double> (0, 0);
 
@@ -19,7 +19,7 @@ Mandelbrot::get_score (const std::complex<double> cval)
 
 
 std::vector<std::complex<double>>
-Mandelbrot::get_trajectory (const std::complex<double> cval)
+Mandelbrot::get_trajectory (std::complex<double> const & cval) const
   {
     auto trajectory = std::vector<std::complex<double>> ();
     auto zval = std::complex<double> (0, 0);
