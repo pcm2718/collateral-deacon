@@ -1,6 +1,9 @@
 #include "buddhaplot.hpp"
 #include <algorithm>
 
+// Get rid of this later.
+#include <random>
+
 
 
 std::ostream &
@@ -50,5 +53,8 @@ operator<< (std::ostream & ost, Buddhaplot const & plot)
 std::string
 Buddhaplot::get_color (long const & score) const
   {
-    return "5";
+    std::random_device rd;
+    std::uniform_int_distribution<int> dist(0, 9);
+    return std::to_string(dist(rd));
+    // return "10";
   };

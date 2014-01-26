@@ -9,7 +9,7 @@ main (int argc, char** argv)
 {
   auto mandelbrot = Mandelbrot (1000);
 
-  auto buddhaplot = Buddhaplot (std::pair<long, long> (10, 10),
+  auto buddhaplot = Buddhaplot (std::pair<long, long> (50, 50),
 				std::pair<std::complex<double>, std::complex<double>> (std::complex<double> (-5, -5), std::complex<double> (5, 5)),
 				1000);
 

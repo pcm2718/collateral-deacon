@@ -28,10 +28,14 @@ public:
   Buddhaplot (std::pair<long, long> const & resolution,
 	      std::pair<std::complex<double>, std::complex<double>> const & range, long const & max_ittr) : 
     RESOLUTION (resolution), RANGE (range), MAX_ITTR (max_ittr),
-    DELTA (std::pair<double, double> ((std::real(range.second) - std::real(range.first) / resolution.first), (std::imag(range.second) - std::imag(range.first) / resolution.second))),
+    DELTA (std::pair<double, double> (
+				      (std::real(range.second) - std::real(range.first) / resolution.first),
+				      (std::imag(range.second) - std::imag(range.first) / resolution.second)
+				      )
+	   ),
     histogram (std::vector<std::vector<long>> (resolution.first, std::vector<long> (resolution.second, 0)))
-      {
-      };
+    {
+    };
 
 
 
@@ -62,6 +66,11 @@ private:
 
   std::string
   get_color (long const & score) const;
+
+
+
+  // std::vector<std::complex<double>>
+  // get_points (long const & count);
 
 
 
