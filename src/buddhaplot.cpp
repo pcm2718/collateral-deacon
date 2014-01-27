@@ -1,7 +1,6 @@
 #include "buddhaplot.hpp"
 #include <algorithm>
-
-// Get rid of this later.
+#include <chrono>
 #include <random>
 
 
@@ -29,14 +28,14 @@ operator<< (std::ostream & ost, Buddhaplot const & plot)
      */
     for ( int j = plot.RESOLUTION.second - 1 ; j >= 0 ; --j )
       {
-	for ( int i = 0 ; i < plot.RESOLUTION.first ; ++i )
-	  {
-	    /*
-	     * Get the greyvalue, put it and a following space into the stream.
-	     */
-	    ost << plot.get_color (plot.histogram[i][j]) << " ";
-	  }
-	ost << std::endl;
+        for ( int i = 0 ; i < plot.RESOLUTION.first ; ++i )
+          {
+            /*
+             * Get the greyvalue, put it and a following space into the stream.
+             */
+            ost << plot.get_color (plot.histogram[i][j]) << " ";
+          }
+        ost << std::endl;
       }
 
     /*
@@ -49,16 +48,43 @@ operator<< (std::ostream & ost, Buddhaplot const & plot)
 
 void
 Buddhaplot::generate_histogram (long const test_count, long const node_count)
-{
-  update_histogram (generate_trajectories (test_count));
-};
+  {
+    update_histogram (generate_trajectories (test_count));
+  };
+
+
+
+/*
+ * This function needs to be checked for correctness.
+ */
+std::vector<std::complex<double>>
+Buddhaplot::get_trajectory (std::complex<double> const & cval) const
+  {
+    auto trajectory = std::vector<std::complex<double>> ();
+    auto zval = std::complex<double> (0, 0);
+ 
+    /*
+     * May need to add condition to detect escape.
+     */
+    for (long n = 0 ; n < MAX_ITTR ; ++n )
+      {
+        trajectory.push_back (zval);
+        zval = std::pow (zval, 2) + cval;
+      }
+    
+    if (std::abs (zval) < 2)
+      return std::vector<std::complex<double>> ();
+    else
+      return trajectory;
+  };
 
 
 
 std::vector<std::complex<double>>
-Buddhaplot::generate_trajectories (long const test_count)
+Buddhaplot::get_points (long const test_count)
 {
-  auto rng = std::mt19937 ();
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  auto rng = std::mt19937 (seed);
   auto real_dist = std::uniform_real_distribution<double> (std::real (RANGE.first), std::real (RANGE.second));
   auto imag_dist = std::uniform_real_distribution<double> (std::imag (RANGE.first), std::imag (RANGE.second));
 
@@ -78,28 +104,28 @@ Buddhaplot::generate_trajectories (long const test_count)
 
 void
 Buddhaplot::update_histogram (std::vector<std::complex<double>> const & points)
-{
-  /*
-   * Put each point into a histogram cell.
-   */
-  for ( auto const & point : points )
-    {
-      long x = (std::real (point) - std::real (RANGE.first)) / DELTA.first;
-      long y = (std::imag (point) - std::imag (RANGE.first)) / DELTA.second;
+  {
+    /*
+     * Put each point into a histogram cell.
+     */
+    for ( auto const & point : points )
+      {
+        long x = (std::real (point) - std::real (RANGE.first)) / DELTA.first;
+        long y = (std::imag (point) - std::imag (RANGE.first)) / DELTA.second;
 
-      ++histogram[x][y];
-    }
+        ++histogram[x][y];
+      }
 
-  /*
-   * Find the cell with the most points, record the value in max_cell.
-   * There may be a better way to do this through the std:: libraries (maybe std::max).
-   */
-  long max = 0;
-  for ( int i = 0 ; i < RESOLUTION.first ; ++i )
-    for ( int j = 0 ; j < RESOLUTION.second ; ++j )
-      if ( histogram[i][j] > max )
-	max = histogram[i][j];
-  max_cell = max;
+    /*
+     * Find the cell with the most points, record the value in max_cell.
+     * There may be a better way to do this through the std:: libraries (maybe std::max).
+     */
+    long max = 0;
+    for ( int i = 0 ; i < RESOLUTION.first ; ++i )
+      for ( int j = 0 ; j < RESOLUTION.second ; ++j )
+        if ( histogram[i][j] > max )
+          max = histogram[i][j];
+    max_cell = max;
 };
 
 

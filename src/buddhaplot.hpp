@@ -3,7 +3,6 @@
 #include <string>
 #include <ostream>
 #include <iostream>
-#include "mandelbrot.hpp"
 
 
 
@@ -22,15 +21,15 @@ public:
    */
 
   Buddhaplot (std::pair<long, long> const & resolution,
-	      std::pair<std::complex<double>, std::complex<double>> const & range, long const max_ittr) : 
-    RESOLUTION (resolution), RANGE (range), mandelbrot (Mandelbrot (max_ittr)),
+              std::pair<std::complex<double>, std::complex<double>> const & range, long const max_ittr) : 
+    RESOLUTION (resolution), RANGE (range), MAX_ITTR (max_ittr),
     DELTA
       (
-	   std::pair<double, double>
-	     (
-	       (std::real(range.second) - std::real(range.first) / resolution.first),
-	       (std::imag(range.second) - std::imag(range.first) / resolution.second)
-	     )
+           std::pair<double, double>
+             (
+               (std::real(range.second) - std::real(range.first) / resolution.first),
+               (std::imag(range.second) - std::imag(range.first) / resolution.second)
+             )
       ),
     max_cell (0),
     histogram (std::vector<std::vector<long>> (resolution.first, std::vector<long> (resolution.second, 0)))
@@ -59,7 +58,7 @@ public:
 
   std::pair<double, double> const DELTA;
 
-  Mandelbrot mandelbrot;
+  long const MAX_ITTR;
 
 
 
@@ -69,13 +68,13 @@ private:
    * Private Methods
    */
 
-  std::string
-  get_color (long const score) const;
+  std::vector<std::complex<double>>
+  generate_trajectory (std::complex<double> const & cval) const;
 
 
 
   std::vector<std::complex<double>>
-  generate_trajectories (long const test_count);
+  get_points (long const test_count);
 
 
 
@@ -85,6 +84,10 @@ private:
   void
   update_histogram (std::vector<std::complex<double>> const & points);
 
+
+
+  std::string
+  get_color (long const score) const;
 
 
 
