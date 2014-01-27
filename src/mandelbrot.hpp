@@ -12,7 +12,7 @@ public:
    * Public Methods
    */
 
-  Mandelbrot (long const & max_ittr): MAX_ITTR(max_ittr)
+  Mandelbrot (long const max_ittr): MAX_ITTR(max_ittr)
     {
     };
 

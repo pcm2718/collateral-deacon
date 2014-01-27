@@ -18,6 +18,9 @@ Mandelbrot::get_score (std::complex<double> const & cval) const
 
 
 
+/*
+ * This function needs to be checked for correctness.
+ */
 std::vector<std::complex<double>>
 Mandelbrot::get_trajectory (std::complex<double> const & cval) const
   {
@@ -26,12 +29,18 @@ Mandelbrot::get_trajectory (std::complex<double> const & cval) const
   
     for (long n = 0 ; n < MAX_ITTR ; ++n )
       {
-        if (std::abs (zval) < 2)
-	  return std::vector<std::complex<double>> ();
+	/*
+	 * This condition may be buggy.
+	 */
+        if (std::abs (zval) > 2)
+	  break;
       
         trajectory.push_back(zval);
         zval = std::pow (zval, 2) + cval;
       }
-  
-    return trajectory;
+    
+    if (std::abs (zval) < 2)
+      return std::vector<std::complex<double>> ();
+    else
+      return trajectory;
   };

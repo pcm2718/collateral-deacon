@@ -2,12 +2,8 @@
 #include <vector>
 #include <string>
 #include <ostream>
-
-
-
-//class Buddhaplot;
-//std::ostream &
-//operator<< (std::ostream &, Buddhaplot const &);
+#include <iostream>
+#include "mandelbrot.hpp"
 
 
 
@@ -26,13 +22,17 @@ public:
    */
 
   Buddhaplot (std::pair<long, long> const & resolution,
-	      std::pair<std::complex<double>, std::complex<double>> const & range, long const & max_ittr) : 
-    RESOLUTION (resolution), RANGE (range), MAX_ITTR (max_ittr),
-    DELTA (std::pair<double, double> (
-				      (std::real(range.second) - std::real(range.first) / resolution.first),
-				      (std::imag(range.second) - std::imag(range.first) / resolution.second)
-				      )
-	   ),
+	      std::pair<std::complex<double>, std::complex<double>> const & range, long const max_ittr) : 
+    RESOLUTION (resolution), RANGE (range), mandelbrot (Mandelbrot (max_ittr)),
+    DELTA
+      (
+	   std::pair<double, double>
+	     (
+	       (std::real(range.second) - std::real(range.first) / resolution.first),
+	       (std::imag(range.second) - std::imag(range.first) / resolution.second)
+	     )
+      ),
+    max_cell (0),
     histogram (std::vector<std::vector<long>> (resolution.first, std::vector<long> (resolution.second, 0)))
     {
     };
@@ -41,6 +41,11 @@ public:
 
   friend std::ostream &
   operator<< (std::ostream &, Buddhaplot const &);
+
+
+
+  void
+  generate_histogram (long const test_count, long const node_count);
 
 
 
@@ -54,7 +59,7 @@ public:
 
   std::pair<double, double> const DELTA;
 
-  long const MAX_ITTR;
+  Mandelbrot mandelbrot;
 
 
 
@@ -65,18 +70,29 @@ private:
    */
 
   std::string
-  get_color (long const & score) const;
+  get_color (long const score) const;
 
 
 
-  // std::vector<std::complex<double>>
-  // get_points (long const & count);
+  std::vector<std::complex<double>>
+  generate_trajectories (long const test_count);
+
+
+
+  /*
+   * I may have to adjust this function to copy, update, and then reassign the histogram vector.
+   */
+  void
+  update_histogram (std::vector<std::complex<double>> const & points);
+
 
 
 
   /*
    * Private Variables
    */
+
+  long max_cell;
 
   Histogram<long> histogram;
 };
