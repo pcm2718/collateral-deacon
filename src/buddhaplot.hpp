@@ -6,12 +6,6 @@
 
 
 
-// This code sort of iffy.
-template <class T>
-using Histogram = std::vector<std::vector<T>>;
-
-
-
 class Buddhaplot
 {
 public:
@@ -21,20 +15,25 @@ public:
    */
 
   Buddhaplot (std::pair<long, long> const & resolution,
-              std::pair<std::complex<double>, std::complex<double>> const & range, long const max_ittr) : 
-    RESOLUTION (resolution), RANGE (range), MAX_ITTR (max_ittr),
+              std::pair<std::complex<double>, std::complex<double>> const & range,
+              std::pair<std::complex<double>, std::complex<double>> const & domain,
+              long const max_ittr) : 
+    RESOLUTION (resolution),
+    RANGE (range),
+    C_DOMAIN (domain),
     DELTA
       (
            std::pair<double, double>
              (
-               (std::real(range.second) - std::real(range.first) / resolution.first),
-               (std::imag(range.second) - std::imag(range.first) / resolution.second)
+               ((std::real (range.second) - std::real (range.first)) / resolution.first),
+               ((std::imag (range.second) - std::imag (range.first)) / resolution.second)
              )
       ),
+    MAX_ITTR (max_ittr),
     max_cell (0),
     histogram (std::vector<std::vector<long>> (resolution.first, std::vector<long> (resolution.second, 0)))
-    {
-    };
+  {
+  }
 
 
 
@@ -55,6 +54,8 @@ public:
   std::pair<long, long> const RESOLUTION;
 
   std::pair<std::complex<double>, std::complex<double>> const RANGE;
+
+  std::pair<std::complex<double>, std::complex<double>> const C_DOMAIN;
 
   std::pair<double, double> const DELTA;
 
@@ -97,5 +98,5 @@ private:
 
   long max_cell;
 
-  Histogram<long> histogram;
+  std::vector<std::vector<long>> histogram;
 };
