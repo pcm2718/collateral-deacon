@@ -1,9 +1,16 @@
+#include <complex>
+#include <vector>
 #include <istream>
 #include <ostream>
 
 
 
-template<class Cell>
+// This may be incorrect usage.
+using Resolution = std::pair<long, long>;
+using Range = std::pair<std::complex<double>, std::complex<double>>;
+
+
+
 class Histogram
 {
 public:
@@ -12,23 +19,43 @@ public:
    * Public Methods
    */
 
-  Histogram (std::pair<long, long> const & resolution,
-             std::pair<std::complex<double>, std::complex<double>> const & range,
-             Cell init) :
+  Histogram (
+             Resolution const & resolution,
+             Range const & range,
+             long init ) :
         RESOLUTION (resolution),
         RANGE (range),
+        DELTA
+        (
+           std::pair<double, double>
+             (
+               ((std::real (range.second) - std::real (range.first)) / resolution.first),
+               ((std::imag (range.second) - std::imag (range.first)) / resolution.second)
+             )
+        ),
         max_cell (init),
-        histogram (std::vector<Cell> (resolution.first * resolution.second, init)
+        histogram (std::vector<long> (resolution.first * resolution.second, init))
   {
   }
 
 
 
-  Cell const &
+  friend std::ostream &
+  operator<< (std::ostream & ost, Histogram const & plot);
+
+
+
+  friend std::istream &
+  operator>> (std::istream & ist, Histogram & plot);
+
+
+
+  long
   get_at (long const x, long const y) const;
 
 
 
+  /*
   Cell const &
   inc_at (long const x, long const y);
 
@@ -41,6 +68,7 @@ public:
 
   Cell const &
   ins_pt (std::complex<double> const & point);
+  */
 
 
 
@@ -49,33 +77,34 @@ public:
 
 
 
-  friend ostream &
-  operator<< (ostream & ost, Histogram const & histogram);
-
-
-
-  friend istream &
-  operator>> (istream & ist, Histogram & histogram);
-
-
-
   /*
    * Public Variables
    */
 
-  std::pair<long, long> const RESOLUTION;
+  Resolution const RESOLUTION;
 
-  std::pair<std::complex<double>, std::complex<double>> const  RANGE;
+  Range const RANGE;
+
+  std::pair<double, double> const DELTA;
 
 
 
 private:
 
   /*
+   * Private Methods
+   */
+
+  std::string
+  get_color (long const score) const;
+
+
+
+  /*
    * Private Variables
    */
 
-  Cell max_cell;
+  long max_cell;
 
-  std::vector<Cell> histogram;
+  std::vector<long> histogram;
 };

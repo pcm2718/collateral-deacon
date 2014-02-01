@@ -1,8 +1,13 @@
 #include <complex>
-#include <vector>
 #include <string>
+#include <vector>
+#include <chrono>
+#include <random>
+#include <algorithm>
 #include <ostream>
-#include <iostream>
+
+#include "pointgen.hpp"
+#include "histogram.hpp"
 
 
 
@@ -14,25 +19,23 @@ public:
    * Public Methods
    */
 
-  Buddhaplot (std::pair<long, long> const & resolution,
-              std::pair<std::complex<double>, std::complex<double>> const & range,
-              std::pair<std::complex<double>, std::complex<double>> const & domain,
-              long const max_ittr) : 
-    RESOLUTION (resolution),
-    RANGE (range),
-    C_DOMAIN (domain),
-    DELTA
-      (
-           std::pair<double, double>
-             (
-               ((std::real (range.second) - std::real (range.first)) / resolution.first),
-               ((std::imag (range.second) - std::imag (range.first)) / resolution.second)
-             )
-      ),
-    MAX_ITTR (max_ittr),
-    max_cell (0),
-    histogram (std::vector<std::vector<long>> (resolution.first, std::vector<long> (resolution.second, 0)))
+  Buddhaplot (
+              CDomain const & c_domain,
+              long const max_ittr,
+              std::vector<Resolution> const & resolutions,
+              std::vector<Range> const & ranges ) : 
+    RESOLUTIONS (resolutions),
+    RANGES (ranges),
+    pointgen (c_domain, max_ittr),
+    histograms ()
   {
+    /*
+     * Find a way to do this in the initializer if at all possible.
+     * May replace vector with some sort of set.
+     * This is a hack.
+     */
+    for ( unsigned long i = 0 ; i < resolutions.size () ; ++i )
+      histograms.push_back (Histogram (resolutions[i], ranges[i], 0));
   }
 
 
@@ -43,7 +46,7 @@ public:
 
 
   void
-  generate_histogram (long const test_count, long const node_count);
+  update_histograms (long const test_count);
 
 
 
@@ -51,34 +54,18 @@ public:
    * Public Variables
    */
 
-  std::pair<long, long> const RESOLUTION;
+  std::vector<std::pair<long, long>> const RESOLUTIONS;
 
-  std::pair<std::complex<double>, std::complex<double>> const RANGE;
-
-  std::pair<std::complex<double>, std::complex<double>> const C_DOMAIN;
-
-  std::pair<double, double> const DELTA;
-
-  long const MAX_ITTR;
+  std::vector<std::pair<std::complex<double>, std::complex<double>>> const RANGES;
 
 
 
-private:
+//private:
 
   /*
    * Private Methods
    */
-
-  std::vector<std::complex<double>>
-  generate_trajectory (std::complex<double> const & cval) const;
-
-
-
-  std::vector<std::complex<double>>
-  get_points (long const test_count);
-
-
-
+  
   /*
    * I may have to adjust this function to copy, update, and then reassign the histogram vector.
    */
@@ -87,16 +74,11 @@ private:
 
 
 
-  std::string
-  get_color (long const score) const;
-
-
-
   /*
    * Private Variables
    */
 
-  long max_cell;
+  Pointgen pointgen;
 
-  std::vector<std::vector<long>> histogram;
+  std::vector<Histogram> histograms;
 };
