@@ -11,8 +11,8 @@
 int
 main (int argc, char* argv[])
 {
-  // Total Test Count, currently 10,000,000.
-  int total_tests = 10000000;
+  // Total Point Count, currently 1,000,000,000.
+  long total_points = 1000000000;
 
   // Process Count
   int ps_count = 0;
@@ -78,12 +78,12 @@ main (int argc, char* argv[])
       /*
        * Compute the number of points to test per PID. HACK.
        */
-      int tests = (total_tests / (ps_count-1) ) + 1;
+      long points = (total_points / (ps_count-1) ) + 1;
 
       /*
        * Run actual tests. Change this comment later.
        */
-      buddhaplot.update_histograms (tests);
+      buddhaplot.update_histograms (points);
 
       /*
        * Write image to image file.

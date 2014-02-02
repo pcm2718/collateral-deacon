@@ -3,9 +3,6 @@
 #include <istream>
 #include <ostream>
 
-
-
-// This may be incorrect usage.
 using Resolution = std::pair<long, long>;
 using Range = std::pair<std::complex<double>, std::complex<double>>;
 

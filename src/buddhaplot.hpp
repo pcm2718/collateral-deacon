@@ -1,9 +1,6 @@
 #include <complex>
 #include <string>
 #include <vector>
-#include <chrono>
-#include <random>
-#include <algorithm>
 #include <ostream>
 #include "mpi.h"
 
@@ -48,7 +45,7 @@ public:
 
 
   void
-  update_histograms (long const test_count);
+  update_histograms (long const point_count);
 
 
 
@@ -65,18 +62,6 @@ public:
 
 
 //private:
-
-  /*
-   * Private Methods
-   */
-  
-  /*
-   * I may have to adjust this function to copy, update, and then reassign the histogram vector.
-   */
-  void
-  update_histogram (std::vector<std::complex<double>> const & points);
-
-
 
   /*
    * Private Variables

@@ -1,11 +1,7 @@
 #include <complex>
 #include <vector>
-#include <chrono>
 #include <random>
 
-
-
-// This may be incorrect usage.
 using CDomain = std::pair<std::complex<double>, std::complex<double>>;
 
 
@@ -22,14 +18,17 @@ public:
             CDomain const & c_domain,
             long const max_ittr ) :
     C_DOMAIN (c_domain),
-    MAX_ITTR (max_ittr)
+    MAX_ITTR (max_ittr),
+    rng (std::mt19937 (std::random_device () ())),
+    real_dist (std::uniform_real_distribution<double> (std::real (C_DOMAIN.first), std::real (C_DOMAIN.second))),
+    imag_dist (std::uniform_real_distribution<double> (std::imag (C_DOMAIN.first), std::imag (C_DOMAIN.second)))
   {
   }
 
 
 
   std::vector<std::complex<double>>
-  get_points (long const point_count) const;
+  get_points (long const c_count);
 
 
 
@@ -50,5 +49,17 @@ private:
    */
 
   std::vector<std::complex<double>>
-  generate_trajectory (std::complex<double> const & cval) const;
+  generate_trajectory (std::complex<double> const & c_val) const;
+
+
+
+  /*
+   * Private Variables
+   */
+
+  std::mt19937 rng;
+
+  std::uniform_real_distribution<double> real_dist;
+
+  std::uniform_real_distribution<double> imag_dist;
 };

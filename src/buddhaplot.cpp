@@ -2,9 +2,6 @@
 
 
 
-/*
- * Might replace this function with overloaded parenthesis.
- */
 void
 Buddhaplot::update_histograms (long const point_count)
 {
