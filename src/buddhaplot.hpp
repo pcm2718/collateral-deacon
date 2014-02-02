@@ -5,6 +5,7 @@
 #include <random>
 #include <algorithm>
 #include <ostream>
+#include "mpi.h"
 
 #include "pointgen.hpp"
 #include "histogram.hpp"
@@ -26,6 +27,7 @@ public:
               std::vector<Range> const & ranges ) : 
     RESOLUTIONS (resolutions),
     RANGES (ranges),
+    CHUNK_SIZE (10000),
     pointgen (c_domain, max_ittr),
     histograms ()
   {
@@ -35,7 +37,7 @@ public:
      * This is a hack.
      */
     for ( unsigned long i = 0 ; i < resolutions.size () ; ++i )
-      histograms.push_back (Histogram (resolutions[i], ranges[i], 0));
+      histograms.push_back (Histogram (resolutions[i], ranges[i]));
   }
 
 
@@ -57,6 +59,8 @@ public:
   std::vector<std::pair<long, long>> const RESOLUTIONS;
 
   std::vector<std::pair<std::complex<double>, std::complex<double>>> const RANGES;
+
+  long const CHUNK_SIZE;
 
 
 

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include "mpi.h"
 /*
  * Add ifndef later.
  */
@@ -8,46 +9,105 @@
 
 
 int
-main ()
+main (int argc, char* argv[])
 {
-  /*
-   * Define our domain for sample c values and max_ittr for plotgen.
-   */
-  auto c_domain = std::pair<std::complex<double>, std::complex<double> > (std::complex<double> (-2.25, -1.5), std::complex<double> (0.75, 1.5));
-  auto max_ittr = 400;
+  // Total Test Count, currently 10,000,000.
+  int total_tests = 10000000;
+
+  // Process Count
+  int ps_count = 0;
+
+  // Process ID
+  int ps_id = 0;
+
+  // Wall Time
+  double wall_time = 0;
 
   /*
-   * Define our lists of histogram settings.
+   * Initialize MPI
    */
-  //auto resolutions = std::vector<std::pair<long, long> > () {std::pair<long, long> (1024, 768)};
-  //auto ranges = std::vector<std::pair<std::complex<double>, std::complex<double> > > () {std::pair<std::complex<double>, std::complex<double> > (std::complex<double> (-2.5, -1), std::complex<double> (1, 1))};
-  auto resolutions = std::vector<std::pair<long, long> > (1, std::pair<long, long> (640, 640));
-  auto ranges = std::vector<std::pair<std::complex<double>, std::complex<double> > > (1, std::pair<std::complex<double>, std::complex<double> > (std::complex<double> (-2.25, -1.5), std::complex<double> (0.75, 1.5)));
+  MPI::Init (argc, argv);
 
   /*
-   * Define buddhaplot object.
+   * Get the number of processes.
    */
+  ps_count = MPI::COMM_WORLD.Get_size ();
+
   /*
-  auto buddhaplot = Buddhaplot (std::pair<long, long> (1024, 768),
-                                std::pair<std::complex<double>, std::complex<double> > (std::complex<double> (-2.5, -1), std::complex<double> (1, 1)),
-                                std::pair<std::complex<double>, std::complex<double> > (std::complex<double> (-2.5, -1), std::complex<double> (1, 1)),
-                                //std::pair<std::complex<double>, std::complex<double> > (std::complex<double> (-0.5, -1.3), std::complex<double> (2, 1.3)),
-                                100);
-                                */
-  auto buddhaplot = Buddhaplot (c_domain, max_ittr, resolutions, ranges);
+   * Get the process ID.
+   */
+  ps_id = MPI::COMM_WORLD.Get_rank ();
 
 
   /*
-   * Test 10,000,000 points.
+   * If the process ID is 0, get the wall_time and then start up a structure to accumulate histograms.
+   * Accumulate histograms until all other processes are finished.
    */
-  buddhaplot.update_histograms (1000000);
+  if (ps_id == 0)
+    {
+      wall_time = MPI::Wtime ();
+
+      // Checkpoint write here.
+
+    }
+  /*
+   * Otherwise, recieve orders from process 0 to start with computations.
+   */
+  else
+    {
+      // Remove this line later.
+      wall_time = MPI::Wtime ();
+
+      /*
+       * Define our domain for sample c values and max_ittr for plotgen.
+       */
+      auto c_domain = std::pair<std::complex<double>, std::complex<double> > (std::complex<double> (-2.25, -1.5), std::complex<double> (0.75, 1.5));
+      auto max_ittr = 400;
+
+      /*
+       * Define our lists of histogram settings.
+       */
+      auto resolutions = std::vector<std::pair<long, long> > (1, std::pair<long, long> (1920, 1920));
+      auto ranges = std::vector<std::pair<std::complex<double>, std::complex<double> > > (1, std::pair<std::complex<double>, std::complex<double> > (std::complex<double> (-2.25, -1.5), std::complex<double> (0.75, 1.5)));
+
+      /*
+       * Define buddhaplot object.
+       */
+      auto buddhaplot = Buddhaplot (c_domain, max_ittr, resolutions, ranges);
+
+      /*
+       * Compute the number of points to test per PID. HACK.
+       */
+      int tests = (total_tests / (ps_count-1) ) + 1;
+
+      /*
+       * Run actual tests. Change this comment later.
+       */
+      buddhaplot.update_histograms (tests);
+
+      /*
+       * Write image to image file.
+       */
+      std::ofstream fileout ("tmp/mpi_" + std::to_string(ps_id) + ".ppm", std::ofstream::out|std::ofstream::trunc);
+      fileout << buddhaplot.histograms[0] << std::endl;
+      fileout.close ();
+    }
+
 
   /*
-   * Write image to image file.
+   * If the process ID is 0, compute and print the elapsed wall time.
    */
-  std::ofstream fileout ("tmp/feh_tmp.ppm", std::ofstream::out|std::ofstream::trunc);
-  fileout << buddhaplot.histograms[0] << std::endl;
-  fileout.close();
+  if (ps_id != 0)
+    {
+      wall_time = MPI::Wtime () - wall_time;
+      std::cout << "PID " << ps_id << " elapsed wall time: " << wall_time << std::endl;
+    }
+
+
+  /*
+   * Terminate MPI
+   */
+  MPI::Finalize ();
 
   return 0;
-}
+};

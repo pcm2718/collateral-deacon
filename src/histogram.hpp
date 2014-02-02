@@ -21,8 +21,7 @@ public:
 
   Histogram (
              Resolution const & resolution,
-             Range const & range,
-             long init ) :
+             Range const & range ) :
         RESOLUTION (resolution),
         RANGE (range),
         DELTA
@@ -33,8 +32,8 @@ public:
                ((std::imag (range.second) - std::imag (range.first)) / resolution.second)
              )
         ),
-        max_cell (init),
-        histogram (std::vector<long> (resolution.first * resolution.second, init))
+        max_cell (0),
+        histogram (std::vector<long> (resolution.first * resolution.second, 0))
   {
   }
 
@@ -44,9 +43,23 @@ public:
   operator<< (std::ostream & ost, Histogram const & plot);
 
 
-
   friend std::istream &
   operator>> (std::istream & ist, Histogram & plot);
+
+
+
+  friend std::ostream &
+  operator<< (std::stringstream & ost, Histogram const & plot);
+
+
+
+  friend std::istream &
+  operator>> (std::stringstream & ist, Histogram & plot);
+
+
+
+  void
+  clear ();
 
 
 
