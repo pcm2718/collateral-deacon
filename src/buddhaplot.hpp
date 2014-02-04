@@ -1,6 +1,7 @@
 #include <complex>
 #include <string>
 #include <vector>
+#include <istream>
 #include <ostream>
 #include "mpi.h"
 
@@ -42,6 +43,20 @@ public:
   friend std::ostream &
   operator<< (std::ostream &, Buddhaplot const &);
 
+
+
+  friend std::istream &
+  operator<< (std::istream &, Buddhaplot &);
+
+
+
+  friend std::ostream &
+  operator<< (std::fstream &, Buddhaplot const &);
+
+
+
+  friend std::istream &
+  operator<< (std::fstream &, Buddhaplot &);
 
 
   void

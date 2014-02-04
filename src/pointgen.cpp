@@ -7,18 +7,12 @@ Pointgen::get_points (long const c_count)
 {
   auto points = std::vector<std::complex<double>> ();
 
-  /*
-   * Note that it is possible, if extremely unlikely, for this loop to be non-terminating.
-   */
-  for ( long i = 0 ; i < c_count ; )
+  for ( long i = 0 ; i < c_count ; ++i )
     {
       auto trajectory = generate_trajectory (std::complex<double> (real_dist (rng), imag_dist (rng)));
 
       if (!trajectory.empty ())
         points.insert (points.end (), trajectory.begin (), trajectory.end ());
-
-      i += trajectory.size ();
-      //++i
     }
 
   return points;

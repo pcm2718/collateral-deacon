@@ -2,6 +2,7 @@
 #include <vector>
 #include <istream>
 #include <ostream>
+#include <stdexcept>
 
 using Resolution = std::pair<long, long>;
 using Range = std::pair<std::complex<double>, std::complex<double>>;
@@ -36,20 +37,43 @@ public:
 
 
 
+  /*
   friend std::ostream &
   operator<< (std::ostream & ost, Histogram const & plot);
 
 
+
   friend std::istream &
   operator>> (std::istream & ist, Histogram & plot);
+  */
 
 
 
+  friend std::ostream &
+  operator<< (std::fstream & ost, Histogram const & plot);
+
+
+
+  /*
+   * NYI
+   */
+  friend std::istream &
+  operator>> (std::fstream & ist, Histogram & plot);
+
+
+
+  /*
+   * NYI
+   */
   friend std::ostream &
   operator<< (std::stringstream & ost, Histogram const & plot);
 
 
 
+  /*
+   * Future implementation of this operator should overwrite existing
+   * data rather than merge the data.
+   */
   friend std::istream &
   operator>> (std::stringstream & ist, Histogram & plot);
 

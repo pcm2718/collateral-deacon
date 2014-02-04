@@ -2,8 +2,15 @@
 
 
 
-std::ostream &
-operator<< (std::ostream & ost, Histogram const & plot)
+friend
+
+
+
+/*
+ * This function writes a ppm file based on the histogram to ost.
+ */
+friend std::ostream &
+operator<< (std::fstream & ost, Histogram const & plot)
 {
   /*
    * Set magic number for filetype. Currently "plain" greymap. Should adjust to binary later.
@@ -42,9 +49,10 @@ operator<< (std::ostream & ost, Histogram const & plot)
 };
 
 
+
 /*
 std::istream &
-operator>> (std::istream & ist, Histogram & plot)
+operator>> (std::fstream & ist, Histogram & plot)
 {
   auto in = std::string ();
 
@@ -91,6 +99,7 @@ operator>> (std::istream & ist, Histogram & plot)
 */
 
 
+
 std::ostream &
 operator<< (std::stringstream & ost, Histogram const & plot)
 {
@@ -98,11 +107,6 @@ operator<< (std::stringstream & ost, Histogram const & plot)
    * Write the dimensions line.
    */
   ost << plot.RESOLUTION.first << " " << plot.RESOLUTION.second << std::endl;
-
-  /*
-   * Write the maximum cell value.
-   */
-  //ost << plot.max_cell << std::endl;
 
   /*
    * Put the actual greydata into the stream.
@@ -131,19 +135,15 @@ std::istream &
 operator>> (std::stringstream & ist, Histogram & plot)
 {
   /*
-   * Make sure the file dimensions match the dimensions of plot.
+   * Make sure the file dimensions match the dimensions of plot. Throw 
+   * an exception if the dimensions of plot don't match.
    */
   long new_width, new_height = 0;
   ist >> new_width >> new_height;
 
-  // Add check here.
-
-  /*
-   * Read past max_cell.
-   * This is a hack.
-   */
-  //long new_max = 0;
-  //ist >> new_max;
+  if ( new_width != plot.RESOLUTION.first
+      || new_width != plot.RESOLUTION.second )
+    throw std::invalid_argument ("Histogram dimensions incompatible.");
 
   /*
    * Read the stream into actual greydata.
@@ -153,11 +153,10 @@ operator>> (std::stringstream & ist, Histogram & plot)
       for ( int i = 0 ; i < plot.RESOLUTION.first ; ++i )
         {
           /*
-           * Get the greyvalue, put it and a following space into the stream.
+           * Read the next cell and add its value to the local cell.
            */
           long new_cell = 0;
           ist >> new_cell;
-
           plot.histogram[j * plot.RESOLUTION.first + i] += new_cell;
         }
     }
@@ -170,6 +169,10 @@ operator>> (std::stringstream & ist, Histogram & plot)
 
 
 
+/*
+ * This function resets each cell of the histogram to 0, and resets
+ * max_cell to 0.
+ */
 void
 Histogram::clear ()
 {
@@ -179,6 +182,9 @@ Histogram::clear ()
 
 
 
+/*
+ * This function gets the value of histogram at (x, y).
+ */
 long
 Histogram::get_at (long const x, long const y) const
 {
@@ -187,15 +193,21 @@ Histogram::get_at (long const x, long const y) const
 
 
 
+/*
+ * This function takes a list of complex points and plots any points in
+ * the area defined by RANGE onto the histogram.
+ */
 void
 Histogram::ins_pts (std::vector<std::complex<double>> const & points)
 {
   /*
-   * Put each point into a histogram cell.
+   * Mark each valid point on the histogram.
    */
   for ( auto const & point : points )
     {
-      // There may be a nice complex operator for this.
+      /*
+       * Ignore point if it is not in RANGE.
+       */
       if (
           std::real (point) < std::real (RANGE.first) ||
           std::imag (point) < std::imag (RANGE.first) ||
@@ -205,17 +217,19 @@ Histogram::ins_pts (std::vector<std::complex<double>> const & points)
         continue;
 
       /*
-       * Might be able to compress this into one complex subtraction and division.
+       * Compute the coordinates of the point on the histogram.
        */
       long x = (std::real (point) - std::real (RANGE.first)) / DELTA.first;
       long y = (std::imag (point) - std::imag (RANGE.first)) / DELTA.second;
 
+      /*
+       * Increment the histogram counter at (x, y).
+       */
       ++histogram[y*RESOLUTION.first + x];
     }
 
   /*
    * Find the cell with the most points, record the value in max_cell.
-   * There may be a better way to do this through the std:: libraries (maybe std::max).
    */
   long max = 0;
   for ( unsigned long i = 0 ; i < histogram.size () ; ++i )
@@ -226,6 +240,10 @@ Histogram::ins_pts (std::vector<std::complex<double>> const & points)
 
 
 
+/*
+ * This function just maps a histogram score to a greyscale value,
+ * nothing special here.
+ */
 std::string
 Histogram::get_color (long const score) const
 {
