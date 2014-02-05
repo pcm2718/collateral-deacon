@@ -2,15 +2,11 @@
 
 
 
-friend
-
-
-
 /*
  * This function writes a ppm file based on the histogram to ost.
  */
-friend std::ostream &
-operator<< (std::fstream & ost, Histogram const & plot)
+std::ostream &
+operator<< (std::ostream & ost, Histogram const & plot)
 {
   /*
    * Set magic number for filetype. Currently "plain" greymap. Should adjust to binary later.
@@ -148,17 +144,17 @@ operator>> (std::stringstream & ist, Histogram & plot)
   /*
    * Read the stream into actual greydata.
    */
-  for ( int j = 0 ; j < plot.RESOLUTION.second ; ++j )
+  for ( unsigned long i = 0 ; i < plot.histogram.size () ; ++i )
     {
-      for ( int i = 0 ; i < plot.RESOLUTION.first ; ++i )
-        {
-          /*
-           * Read the next cell and add its value to the local cell.
-           */
-          long new_cell = 0;
-          ist >> new_cell;
-          plot.histogram[j * plot.RESOLUTION.first + i] += new_cell;
-        }
+      /*
+       * Read the next cell and add its value to the local cell.
+       */
+      long new_cell = 0;
+      ist >> new_cell;
+      plot.histogram[i] += new_cell;
+
+      if ( plot.histogram[i] > plot.max_cell )
+        plot.max_cell = plot.histogram[i];
     }
 
   /*
@@ -231,11 +227,9 @@ Histogram::ins_pts (std::vector<std::complex<double>> const & points)
   /*
    * Find the cell with the most points, record the value in max_cell.
    */
-  long max = 0;
   for ( unsigned long i = 0 ; i < histogram.size () ; ++i )
-    if ( histogram[i] > max )
-      max = histogram[i];
-  max_cell = max;
+    if ( histogram[i] > max_cell )
+      max_cell = histogram[i];
 };
 
 

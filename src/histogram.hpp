@@ -2,6 +2,7 @@
 #include <vector>
 #include <istream>
 #include <ostream>
+#include <iostream>
 #include <stdexcept>
 
 using Resolution = std::pair<long, long>;
@@ -50,7 +51,7 @@ public:
 
 
   friend std::ostream &
-  operator<< (std::fstream & ost, Histogram const & plot);
+  operator<< (std::ostream & ost, Histogram const & plot);
 
 
 
@@ -58,7 +59,7 @@ public:
    * NYI
    */
   friend std::istream &
-  operator>> (std::fstream & ist, Histogram & plot);
+  operator>> (std::istream & ist, Histogram & plot);
 
 
 

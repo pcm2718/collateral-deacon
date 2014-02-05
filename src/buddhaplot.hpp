@@ -19,10 +19,12 @@ public:
    */
 
   Buddhaplot (
+              int node,
               CDomain const & c_domain,
               long const max_ittr,
               std::vector<Resolution> const & resolutions,
-              std::vector<Range> const & ranges ) : 
+              std::vector<Range> const & ranges ) :
+    NODE (node),
     RESOLUTIONS (resolutions),
     RANGES (ranges),
     CHUNK_SIZE (10000),
@@ -67,6 +69,8 @@ public:
   /*
    * Public Variables
    */
+
+  int const NODE;
 
   std::vector<std::pair<long, long>> const RESOLUTIONS;
 
